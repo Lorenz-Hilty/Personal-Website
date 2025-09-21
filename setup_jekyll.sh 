@@ -1,0 +1,35 @@
+#!/bin/zsh
+
+# 1️⃣ Homebrew Ruby prüfen
+echo "Prüfe Homebrew Ruby..."
+brew list ruby >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+    echo "Homebrew Ruby nicht installiert. Installiere..."
+    brew install ruby
+else
+    echo "Homebrew Ruby ist installiert."
+fi
+
+# 2️⃣ Gems EXECUTABLE DIRECTORY herausfinden
+GEMS_DIR=$(ruby -e 'require "rubygems"; puts Gem.user_dir')
+EXEC_DIR="$GEMS_DIR/bin"
+echo "Gems executables liegen hier: $EXEC_DIR"
+
+# 3️⃣ PATH in .zprofile setzen (überschreibt alte Ruby-Zeilen)
+echo "export PATH=\"$EXEC_DIR:/opt/homebrew/opt/ruby/bin:\$PATH\"" > ~/.zprofile
+source ~/.zprofile
+echo "PATH gesetzt auf: $PATH"
+
+# 4️⃣ Jekyll und Bundler installieren (nur für Benutzer, kein sudo)
+echo "Installiere Jekyll und Bundler..."
+gem install --user-install bundler jekyll
+
+# 5️⃣ Prüfen, ob Jekyll jetzt gefunden wird
+echo "Prüfe Jekyll-Version..."
+if command -v jekyll >/dev/null 2>&1; then
+    jekyll -v
+    echo "Jekyll ist jetzt einsatzbereit!"
+else
+    echo "Fehler: Jekyll wird noch immer nicht gefunden. Bitte die Ausgaben prüfen."
+fi
+
